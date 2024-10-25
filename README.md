@@ -3,8 +3,12 @@
 
     Projekti, jonka tarkoitus on havainnollistaa kokemusta työskentelystä
     erilaisten tekniikoiden ja toiminnallisuuksien parissa.
-
+    
     Projekti havainnollistaa logistiikka-alan yrityksen kuljetusten seurantaan tarkoitettua sovellusta.
+
+    Projektissa käytettäviä tekniikoita: 
+        - React&Vite frontendissä.
+        - MongoDB, mongoose, express backendissä.
 
 # Backend
 
