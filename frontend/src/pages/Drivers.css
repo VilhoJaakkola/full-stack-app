@@ -1,0 +1,24 @@
+.show-button{
+    background-color: darkcyan;
+    font-size: 1.5rem;
+    color: white;
+    padding: 10px 20px;
+    margin: 10px;
+    cursor: pointer;
+    border-radius: 1rem;
+    border: 2px solid black;
+}
+
+.show-button:hover {
+    background-color: darkslategray;
+    color: white;
+}
+
+.driver-details{
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 1rem;
+}

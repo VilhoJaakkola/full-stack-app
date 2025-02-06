@@ -49,7 +49,6 @@ const userSchema = new mongoose.Schema({
 });
 
 // Esimerkkimenetelmät, kuten tokenien käsittely, salasanojen hashays jne.
-// ...
 
 userSchema.methods.toJSON = function () {
     const user = this;
@@ -83,6 +82,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return user;
 }
 
+// Hashataan salasana ennen tallennusta
 userSchema.pre('save', async function (next) {
     const user = this;
 

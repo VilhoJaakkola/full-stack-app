@@ -1,12 +1,38 @@
+networks:
+  localnet:
+    driver: bridge
+
 services:
   # MongoDB-palvelu
   db:
-    image: mongo
-    ports:
+    image: mongo # Määritetään käytettävä Docker-image
+    #command: mongod --auth --dbpath /data/db
+    command: mongod --config /etc/mongod.conf # Pakota käyttämään omaa konfiguraatiota    
+    ports: # Porttimääritykset
       - "27017:27017"
-    volumes:
+    volumes: # Volyymien liittäminen
       - mongo-data:/data/db
-    restart: no
+      - ./mongod.conf:/etc/mongod.conf:ro
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+    environment: # Ympäristömuuttujat
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_BACKEND_USER: ${MONGO_BACKEND_USER}
+      MONGO_BACKEND_PASSWORD: ${MONGO_BACKEND_PASSWORD}
+      MONGO_DATABASE: ${MONGO_DATABASE}
+      GLIBC_TUNABLES: glibc.pthread.rseq=0
+    # secrets:
+    #   - mongo_root_user
+    #   - mongo_root_password
+    #   - mongo_backend_user
+    #   - mongo_backend_password
+    #   - mongo_database
+    networks: # Verkkoasetukset
+      - localnet
+    # deploy:
+    #   restart_policy:
+    #     condition: none
+    restart: no # Automaaattinen uudelleenkäynnistys
 
   # Mongo Express -palvelu
   mongoex:
@@ -17,8 +43,59 @@ services:
       - ME_CONFIG_MONGODB_PORT=27017
       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
       - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - ME_CONFIG_BASICAUTH_USERNAME=${MONGOEXPRESS_USER}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGOEXPRESS_PASSWORD}
+    networks:
+      - localnet
     ports:
-      - "8081:8081"
+      - "127.0.0.1:8081:8081"
     depends_on:
       - db
+    # deploy:
+    #   restart_policy:
+    #     condition: none
     restart: no
+
+volumes:
+  mongo-data:
+
+# secrets:
+#     mongo_root_user:
+#       external: true
+#     mongo_root_password:
+#       external: true
+#     mongo_backend_user:
+#       external: true
+#     mongo_backend_password:
+#       external: true
+#     mongo_database:
+#       external: true
+
+
+
+# services:
+#   # MongoDB-palvelu
+#   db:
+#     image: mongo
+#     ports:
+#       - "27017:27017"
+#     volumes:
+#       - mongo-data:/data/db
+#     restart: no
+
+#   # Mongo Express -palvelu
+#   mongoex:
+#     image: mongo-express
+#     environment:
+#       - ME_CONFIG_OPTIONS_EDITORTHEME=ambiance
+#       - ME_CONFIG_MONGODB_SERVER=db
+#       - ME_CONFIG_MONGODB_PORT=27017
+#       - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+#       - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+#     ports:
+#       - "8081:8081"
+#     depends_on:
+#       - db
+#     restart: no
